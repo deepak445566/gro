@@ -20,7 +20,7 @@ await connectDB();
 await connectCloudinary();
 
 // Allowed origins
-const allowedOrigins = ['http://localhost:5173'];
+const allowedOrigins = ['https://verdant-moonbeam-8b4762.netlify.app'];
 
 // Middleware
 app.use(express.json());
