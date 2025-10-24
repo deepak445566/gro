@@ -16,7 +16,7 @@ const InputField = ({ type, placeholder, name, handleChange, address }) => (
 )
 
 function Addaddress() {
-  const { axios, user, navigate } = useAppContext();
+  const { axios, user, navigate, fetchUser } = useAppContext();
   
   const [address, setAddress] = useState({
     firstname: "",
@@ -40,11 +40,9 @@ function Addaddress() {
     }));
   };
 
-  // Validate form function
   const validateForm = () => {
     const requiredFields = ['firstname', 'lastname', 'email', 'street', 'city', 'state', 'zipcode', 'country', 'phone'];
     
-    // Check for empty fields
     for (let field of requiredFields) {
       if (!address[field]?.trim()) {
         toast.error(`Please fill in ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`);
@@ -52,14 +50,12 @@ function Addaddress() {
       }
     }
     
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(address.email)) {
       toast.error('Please enter a valid email address');
       return false;
     }
     
-    // Phone validation (basic)
     if (address.phone.length < 10) {
       toast.error('Please enter a valid phone number');
       return false;
@@ -71,9 +67,7 @@ function Addaddress() {
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     
-    console.log('User object:', user);
-    
-    if (!user || !user._id) {
+    if (!user) {
       toast.error('Please login to add address');
       navigate('/login');
       return;
@@ -87,23 +81,20 @@ function Addaddress() {
     
     try {
       console.log('Making API call to /api/address/add');
+      console.log('Current user:', user);
       
-      // Remove userId from request body since backend gets it from token
+      // Check if we have a token
+      const token = localStorage.getItem('token');
+      console.log('Token available:', !!token);
+      
       const requestData = {
         address: address
-        // Remove userId: user._id - backend gets it from token
       };
       
       console.log('Request Data:', requestData);
       
-      // Make sure axios is configured to send cookies
-      const { data } = await axios.post('/api/address/add', requestData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        withCredentials: true // This is crucial for sending cookies
-      });
-
+      const { data } = await axios.post('/api/address/add', requestData);
+      
       console.log('API Response:', data);
 
       if (data.success) {
@@ -125,12 +116,10 @@ function Addaddress() {
       } else if (error.message) {
         errorMessage = error.message;
       } else if (error.response?.status === 401) {
-        errorMessage = 'Please login again';
+        errorMessage = 'Session expired. Please login again.';
+        // Clear invalid token and redirect to login
+        localStorage.removeItem('token');
         navigate('/login');
-      } else if (error.response?.status === 400) {
-        errorMessage = 'Invalid address data';
-      } else if (error.response?.status === 500) {
-        errorMessage = 'Server error. Please try again later.';
       }
       
       toast.error(errorMessage);
@@ -139,17 +128,20 @@ function Addaddress() {
     }
   };
 
-  // Check if user is properly loaded
   useEffect(() => {
-    console.log('User state changed:', user);
+    console.log('User in AddAddress:', user);
     
     if (!user) {
-      console.log('No user found, redirecting...');
-      toast.error('Please login to continue');
-      navigate("/login");
-      return;
+      console.log('No user found, checking authentication...');
+      // Try to fetch user again
+      fetchUser().then(updatedUser => {
+        if (!updatedUser) {
+          toast.error('Please login to continue');
+          navigate("/login");
+        }
+      });
     }
-  }, [user, navigate]);
+  }, [user, navigate, fetchUser]);
 
   return (
     <>
@@ -158,7 +150,6 @@ function Addaddress() {
           Add Shipping <span className="font-semibold text-primary">Address</span>
         </p>
 
-        {/* Show user info for debugging */}
         {user && (
           <div className="mt-4 p-3 bg-blue-50 rounded">
             <p className="text-sm text-blue-700">

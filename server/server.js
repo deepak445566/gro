@@ -11,7 +11,7 @@ import cartRouter from './routes/CardRoute.js';
 import addressRouter from './routes/AddressRoute.js';
 import orderRouter from './routes/OrderRoute.js';
 
-dotenv.config(); // load .env
+dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -19,27 +19,47 @@ const port = process.env.PORT || 3000;
 await connectDB();
 await connectCloudinary();
 
-// Allowed origins
-const allowedOrigins = ['https://gro-livid.vercel.app'];
+// Simple CORS configuration
+app.use(cors({
+  origin: [
+    'https://gro-livid.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:5173'
+  ],
+  credentials: true
+}));
 
 // Middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(cookieParser());
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+
+// Debug middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path} - Cookies:`, req.cookies);
+  next();
+});
 
 // Routes
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });
 
-app.use('/api/user',UserRouter );
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    success: true, 
+    message: 'Server is running'
+  });
+});
+
+app.use('/api/user', UserRouter);
 app.use('/api/seller', sellerRouter);
 app.use('/api/product', ProductRouter);
-
 app.use('/api/cart', cartRouter);
 app.use('/api/address', addressRouter);
 app.use('/api/order', orderRouter);
+
 // Server start
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  console.log(`Server running on port ${port}`);
 });
