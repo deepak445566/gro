@@ -71,7 +71,9 @@ function Addaddress() {
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     
-    if (!user) {
+    console.log('User object:', user); // Debug user object
+    
+    if (!user || !user._id) {
       toast.error('Please login to add address');
       navigate('/login');
       return;
@@ -84,21 +86,16 @@ function Addaddress() {
     setLoading(true);
     
     console.log('=== FORM SUBMISSION DEBUG ===');
-    console.log('User ID:', user?._id);
+    console.log('User ID:', user._id);
+    console.log('Full User Object:', user);
     console.log('Address Data:', address);
     
     try {
       console.log('Making API call to /api/address/add');
       
-      // Try both structures - one might work based on your backend
       const requestData = {
-        // Option 1: Nested address structure
         address: address,
         userId: user._id
-        
-        // Option 2: Flat structure (uncomment if above doesn't work)
-        // ...address,
-        // userId: user._id
       };
       
       console.log('Request Data:', requestData);
@@ -122,7 +119,6 @@ function Addaddress() {
       console.error('Full Error:', error);
       console.error('Response Data:', error.response?.data);
       console.error('Status Code:', error.response?.status);
-      console.error('Headers:', error.response?.headers);
       
       let errorMessage = 'Failed to add address';
       
@@ -132,6 +128,7 @@ function Addaddress() {
         errorMessage = error.message;
       } else if (error.response?.status === 401) {
         errorMessage = 'Please login again';
+        navigate('/login');
       } else if (error.response?.status === 400) {
         errorMessage = 'Invalid address data';
       } else if (error.response?.status === 500) {
@@ -144,68 +141,44 @@ function Addaddress() {
     }
   };
 
-  // Alternative API call function if the main one doesn't work
-  const onSubmitHandlerAlternative = async (e) => {
-    e.preventDefault();
+  // Check if user is properly loaded
+  useEffect(() => {
+    console.log('User state changed:', user);
     
     if (!user) {
-      toast.error('Please login to add address');
+      console.log('No user found, redirecting...');
+      toast.error('Please login to continue');
+      navigate("/login");
       return;
     }
     
-    setLoading(true);
-    
-    try {
-      // Alternative: Send flat structure
-      const requestData = {
-        firstname: address.firstname,
-        lastname: address.lastname,
-        email: address.email,
-        street: address.street,
-        city: address.city,
-        state: address.state,
-        zipcode: address.zipcode,
-        country: address.country,
-        phone: address.phone,
-        userId: user._id
-      };
-      
-      console.log('Alternative Request Data:', requestData);
-      
-      const { data } = await axios.post('/api/address/create', requestData); // Try different endpoint
-      
-      if (data.success) {
-        toast.success('Address added successfully!');
-        navigate("/cart");
-      }
-    } catch (error) {
-      console.error('Alternative method failed:', error);
-      toast.error('Failed to add address. Please check console for details.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (!user) {
-      toast.error('Please login to add address');
-      navigate("/cart");
+    if (user && !user._id) {
+      console.log('User exists but no _id:', user);
+      toast.error('User session invalid. Please login again.');
+      navigate("/login");
     }
   }, [user, navigate]);
 
-  // Test connection on component mount
+  // Add a check for user authentication on component mount
   useEffect(() => {
-    const testConnection = async () => {
+    const checkAuth = async () => {
       try {
-        const response = await axios.get('/api/health'); // Or any test endpoint
-        console.log('Backend connection:', response.status);
+        // Try to get current user from backend to verify session
+        const { data } = await axios.get('/api/user/current');
+        console.log('Current user from API:', data);
       } catch (error) {
-        console.warn('Backend connection test failed:', error.message);
+        console.error('Auth check failed:', error);
+        if (error.response?.status === 401) {
+          toast.error('Session expired. Please login again.');
+          navigate('/login');
+        }
       }
     };
-    
-    testConnection();
-  }, [axios]);
+
+    if (!user) {
+      checkAuth();
+    }
+  }, [axios, navigate, user]);
 
   return (
     <>
@@ -213,6 +186,15 @@ function Addaddress() {
         <p className="text-2xl md:text-3xl text-gray-500">
           Add Shipping <span className="font-semibold text-primary">Address</span>
         </p>
+
+        {/* Show user info for debugging */}
+        {user && (
+          <div className="mt-4 p-3 bg-blue-50 rounded">
+            <p className="text-sm text-blue-700">
+              Logged in as: {user.email || user.name} | User ID: {user._id ? user._id : 'Not available'}
+            </p>
+          </div>
+        )}
 
         <div className="flex flex-col-reverse md:flex-row justify-between mt-10">
           <div className="flex-1 max-w-md">
@@ -294,9 +276,9 @@ function Addaddress() {
 
               <button 
                 type="submit" 
-                disabled={loading}
+                disabled={loading || !user || !user._id}
                 className={`w-full mt-6 py-3 hover:bg-primary-dull transition uppercase ${
-                  loading 
+                  loading || !user || !user._id
                     ? 'bg-gray-400 cursor-not-allowed' 
                     : 'bg-primary text-white cursor-pointer'
                 }`}
@@ -304,17 +286,12 @@ function Addaddress() {
                 {loading ? 'Adding Address...' : 'Save Address'}
               </button>
 
-              {/* Debug button - remove in production */}
-              <button 
-                type="button"
-                onClick={() => {
-                  console.log('Current address state:', address);
-                  console.log('User:', user);
-                }}
-                className="w-full mt-2 py-2 bg-gray-500 text-white rounded"
-              >
-                Debug Log
-              </button>
+              {/* Debug info */}
+              <div className="mt-4 p-2 bg-gray-100 rounded text-xs">
+                <p>Debug Info:</p>
+                <p>User: {user ? 'Logged in' : 'Not logged in'}</p>
+                <p>User ID: {user?._id || 'Not available'}</p>
+              </div>
             </form>
           </div>
 
