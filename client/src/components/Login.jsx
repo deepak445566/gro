@@ -3,63 +3,41 @@ import { useAppContext } from '../context/AppContext';
 import toast from 'react-hot-toast';
 
 function Login() {
-  const {setShowLogin,setUser,axios,navigate, fetchUser}= useAppContext()
-  const [state, setState] = React.useState("login");
-  const [name, setName] = React.useState("");
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [loading, setLoading] = React.useState(false);
 
-  const onSubmitHandle = async (e) => {
-    e.preventDefault();
-    setLoading(true);
 
-    try {
-      let payload = {};
+  const {setShowLogin,setUser,axios,navigate}= useAppContext()
+      const [state, setState] = React.useState("login");
+    const [name, setName] = React.useState("");
+    const [email, setEmail] = React.useState("");
+    const [password, setPassword] = React.useState("");
 
-      if (state === "register") {
-        payload = { name, email, password };
-      } else {
-        payload = { email, password };
-      }
 
-      console.log('Making login/register request...');
-      
-      const { data } = await axios.post(`/api/user/${state}`, payload);
 
-      console.log('Login Response:', data);
+const onSubmitHandle = async (e) => {
+  e.preventDefault();
 
-      if (data.success) {
-        // If backend sends token in response, store it
-        if (data.token) {
-          localStorage.setItem('token', data.token);
-          console.log('Token stored in localStorage:', data.token);
-        }
-        
-        // If backend sends user data
-        if (data.user) {
-          setUser(data.user);
-        }
-        
-        toast.success(`Welcome ${data.user?.name || 'User'}!`);
-        setShowLogin(false);
-        navigate('/');
-        
-        // Refresh user data to ensure authentication is working
-        setTimeout(() => {
-          fetchUser();
-        }, 1000);
-        
-      } else {
-        toast.error(data.message);
-      }
-    } catch (error) {
-      console.error('Login Error:', error);
-      toast.error(error.response?.data?.message || error.message);
-    } finally {
-      setLoading(false);
+  try {
+    let payload = {};
+
+    if (state === "register") {
+      payload = { name, email, password };
+    } else {
+      payload = { email, password }; // login expects only these two
     }
-  };
+
+    const { data } = await axios.post(`/api/user/${state}`, payload);
+
+    if (data.success) {
+      navigate('/');
+      setUser(data.user);
+      setShowLogin(false);
+    } else {
+      toast.error(data.message);
+    }
+  } catch (error) {
+    toast.error(error.response?.data?.message || error.message);
+  }
+};
 
   return (
    <>
@@ -91,13 +69,8 @@ function Login() {
                     Create an account? <span onClick={() => setState("register")} className="text-primary cursor-pointer">click here</span>
                 </p>
             )}
-            <button 
-              disabled={loading}
-              className={`bg-primary hover:bg-primary-dull transition-all text-white w-full py-2 rounded-md cursor-pointer ${
-                loading ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
-            >
-                {loading ? 'Processing...' : (state === "register" ? "Create Account" : "Login")}
+            <button className="bg-primary hover:bg-primary-dull transition-all text-white w-full py-2 rounded-md cursor-pointer">
+                {state === "register" ? "Create Account" : "Login"}
             </button>
         </form>
 </div>

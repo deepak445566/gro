@@ -4,9 +4,14 @@ import { dummyProducts } from "../assets/assets";
 import toast from "react-hot-toast";
 import axios from "axios";
 
-// Configure axios defaults
+
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
+
+
+
+
+
 
 export const AppContext = createContext();
 
@@ -20,23 +25,14 @@ export const AppContextProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState({});
   const [search, setSearch] = useState({});
 
-  // Add token to axios requests if available
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    } else {
-      delete axios.defaults.headers.common['Authorization'];
-    }
-  }, []);
-
-  // Fetch seller status
-  const fetchSeller = async () => {
+  //status//
+  const fetchSeller = async () =>{
     try {
       const {data} = await axios.get("/api/seller/isauth");
       if(data.success){
         setIsSeller(true);
-      } else {
+      }
+      else{
         setIsSeller(false);
       }
     } catch (error) {
@@ -44,52 +40,38 @@ export const AppContextProvider = ({ children }) => {
     }
   }
 
-  // Fetch user with token authentication
-  const fetchUser = async () => {
+
+
+  const fetchUser = async ()=>{
     try {
-      const token = localStorage.getItem('token');
-      console.log('Fetching user with token:', token);
-      
       const {data} = await axios.get('/api/user/isauth');
-      console.log('User auth response:', data);
-      
       if(data.success){
-        setUser(data.user);
-        setCartItems(data.user.cartItems || {});
-        return data.user;
-      } else {
-        setUser(null);
-        return null;
+        setUser(data.user)
+        setCartItems(data.user.cartItems)
+
       }
     } catch (error) {
-      console.error('Error fetching user:', error);
-      setUser(null);
-      return null;
+      setUser(null)
     }
   }
 
+
   // Fetch products
   const fetchProducts = async () => {
-    try {
-      const {data} = await axios.get("/api/product/list")
-      if(data.success){
-        setProducts(data.products)
-      } else {
-        toast.error(data.message)
-      }
-    } catch(error) {
-      toast.error(error.message)
-    }
+   try{
+const {data} = await axios.get("/api/product/list")
+if(data.success){
+  setProducts(data.products)
+}else{
+  toast.error(data.message)
+}
+   }catch(error){
+toast.error(error.message)
+   }
   };
 
   // Add to cart
   const addToCart = (itemId) => {
-    if (!user) {
-      setShowLogin(true);
-      toast.error('Please login to add items to cart');
-      return;
-    }
-    
     let cartData = structuredClone(cartItems);
     if (cartData[itemId]) {
       cartData[itemId] += 1;
@@ -97,6 +79,7 @@ export const AppContextProvider = ({ children }) => {
       cartData[itemId] = 1;
     }
     setCartItems(cartData);
+    console.log(cartItems);
     toast.success("Added to Cart");
   };
 
@@ -134,54 +117,41 @@ export const AppContextProvider = ({ children }) => {
     for (const itemId in cartItems) {
       let itemInfo = products.find((pro) => pro._id === itemId);
       if (itemInfo && cartItems[itemId] > 0) {
-        totalAmount += itemInfo.offerPrice * cartItems[itemId];
+        totalAmount += itemInfo.offerPrice * cartItems[itemId]; // ✅ fixed property name
       }
     }
     return Math.floor(totalAmount * 100) / 100;
   };
 
-  // Logout function
-  const logout = async () => {
-    try {
-      await axios.post('/api/user/logout');
-      localStorage.removeItem('token');
-      setUser(null);
-      setCartItems({});
-      toast.success('Logged out successfully');
-      navigate('/');
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
-
   useEffect(() => {
-    fetchSeller();
-    fetchUser();
-    fetchProducts();
+    fetchSeller()
+    fetchUser()
+    fetchProducts()
   }, []);
-
-  // Update cart in database
-  useEffect(() => {
-    const updateCartInDB = async () => {
-      try {
-        if (user && user._id) {
-          const { data } = await axios.post('/api/cart/update', {
-            userId: user._id,
-            cartItems
-          });
-          if (!data.success) {
-            toast.error(data.message);
-          }
-        }
-      } catch (error) {
-        console.error('Cart update error:', error);
-      }
-    };
-
-    if(user && Object.keys(cartItems).length > 0) {
-      updateCartInDB();
+//databasecrt items//
+useEffect(()=>{
+const updateCart = async () => {
+  try {
+    const { data } = await axios.post('/api/cart/update', {
+      userId: user._id,   // make sure user object has _id
+      cartItems
+    });
+    if (!data.success) {
+      toast.error(data.message);
     }
-  }, [cartItems, user]);
+  } catch (error) {
+    toast.error(error.message);
+  }
+};
+
+if(user){
+  updateCart()
+}
+
+
+},[cartItems])
+
+
 
   const value = {
     navigate,
@@ -194,7 +164,7 @@ export const AppContextProvider = ({ children }) => {
     products,
     addToCart,
     updateCart,
-    removeFromCart,
+    removeFromCart, // ⬅ new function
     cartItems,
     search,
     setSearch,
@@ -202,14 +172,13 @@ export const AppContextProvider = ({ children }) => {
     gettotal,
     axios,
     fetchProducts,
-    setCartItems,
-    fetchUser, // Export fetchUser
-    logout // Export logout
+    setCartItems
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
 
+// Custom hook
 export const useAppContext = () => {
   return useContext(AppContext);
 };
