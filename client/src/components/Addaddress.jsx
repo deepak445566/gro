@@ -71,7 +71,7 @@ function Addaddress() {
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     
-    console.log('User object:', user); // Debug user object
+    console.log('User object:', user);
     
     if (!user || !user._id) {
       toast.error('Please login to add address');
@@ -85,25 +85,23 @@ function Addaddress() {
     
     setLoading(true);
     
-    console.log('=== FORM SUBMISSION DEBUG ===');
-    console.log('User ID:', user._id);
-    console.log('Full User Object:', user);
-    console.log('Address Data:', address);
-    
     try {
       console.log('Making API call to /api/address/add');
       
+      // Remove userId from request body since backend gets it from token
       const requestData = {
-        address: address,
-        userId: user._id
+        address: address
+        // Remove userId: user._id - backend gets it from token
       };
       
       console.log('Request Data:', requestData);
       
+      // Make sure axios is configured to send cookies
       const { data } = await axios.post('/api/address/add', requestData, {
         headers: {
           'Content-Type': 'application/json',
-        }
+        },
+        withCredentials: true // This is crucial for sending cookies
       });
 
       console.log('API Response:', data);
@@ -151,34 +149,7 @@ function Addaddress() {
       navigate("/login");
       return;
     }
-    
-    if (user && !user._id) {
-      console.log('User exists but no _id:', user);
-      toast.error('User session invalid. Please login again.');
-      navigate("/login");
-    }
   }, [user, navigate]);
-
-  // Add a check for user authentication on component mount
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        // Try to get current user from backend to verify session
-        const { data } = await axios.get('/api/user/current');
-        console.log('Current user from API:', data);
-      } catch (error) {
-        console.error('Auth check failed:', error);
-        if (error.response?.status === 401) {
-          toast.error('Session expired. Please login again.');
-          navigate('/login');
-        }
-      }
-    };
-
-    if (!user) {
-      checkAuth();
-    }
-  }, [axios, navigate, user]);
 
   return (
     <>
@@ -285,13 +256,6 @@ function Addaddress() {
               >
                 {loading ? 'Adding Address...' : 'Save Address'}
               </button>
-
-              {/* Debug info */}
-              <div className="mt-4 p-2 bg-gray-100 rounded text-xs">
-                <p>Debug Info:</p>
-                <p>User: {user ? 'Logged in' : 'Not logged in'}</p>
-                <p>User ID: {user?._id || 'Not available'}</p>
-              </div>
             </form>
           </div>
 
