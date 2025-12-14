@@ -24,7 +24,7 @@ const isProd = process.env.NODE_ENV === "production";
 
 app.use(cors({
   origin: isProd 
-    ? "https://gro-livid.vercel.app"  // Deploy ke liye exact URL
+    ? "https://gro-livid.vercel.app/"  // Deploy ke liye exact URL
     : "http://localhost:5173",                   // Local testing
   credentials: true
 }));
