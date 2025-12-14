@@ -32,10 +32,10 @@ toast.error(error.message)
      }
   return (
   <>
- <nav className="flex items-center justify-between px-6 md:px-16 lg:px-24  py-2 border-b border-gray-300 bg-white relative transition-all z-40">
+ <nav className="flex items-center justify-between px-6 md:px-16 lg:px-24  py-4 border-b border-gray-300 bg-white relative transition-all z-40">
 
           <NavLink to='/' onClick={()=>setOpen(false)}>
-            <img src="/logo1.png" className='h-15 w-15'/>
+            <img src={assets.logo}/>
           </NavLink>
 
             {/* Desktop Menu */}

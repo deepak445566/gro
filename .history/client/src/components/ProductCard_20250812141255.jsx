@@ -5,7 +5,7 @@ import { assets } from "../assets/assets";
 function ProductCard({product}) {
 
   const {  addToCart, removeFromCart, cartItems,navigate} =useAppContext();
-  const currency = "₹";
+  const currency = "$";
 
 
 
@@ -15,7 +15,7 @@ function ProductCard({product}) {
       {/* Image */}
       <div className="group cursor-pointer flex items-center justify-center px-2">
         <img
-          className="group-hover:scale-105 transition-transform max-w-[6.5rem] md:max-w-[9rem] h-30"
+          className="group-hover:scale-105 transition-transform max-w-[6.5rem] md:max-w-[9rem]"
           src={product.image[0]}
           alt={product.name}
         />

@@ -6,7 +6,6 @@ import BestSeller from '../components/BestSeller'
 
 import NewsLetter from '../components/NewsLetter'
 import OurStory from '../components/ourStory'
-import Reviews from '../components/Reviews'
 
 export default function() {
   return (
@@ -16,7 +15,7 @@ export default function() {
    
     <BestSeller/>
     <OurStory/>
-  <Reviews/>
+  
    
    </div>
    </>

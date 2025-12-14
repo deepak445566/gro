@@ -29,7 +29,7 @@ setThumbnail(product?.image[0]?product.image[0]:null)
             <p>
                 <Link to={"/"}>Home</Link> /
                 <Link to={"/products"}> Products</Link> /
-                <Link to={`/products/₹{product.category.toLowerCase()}`}> {product.category}</Link> /
+                <Link to={`/products/${product.category.toLowerCase()}`}> {product.category}</Link> /
                 <span className="text-primary"> {product.name}</span>
             </p>
 
@@ -44,7 +44,7 @@ setThumbnail(product?.image[0]?product.image[0]:null)
                     </div>
 
                     <div className="border border-gray-500/30 max-w-100 rounded overflow-hidden">
-                        <img src={thumbnail} alt="Selected product" className="w-full h-full object-contain" />
+                        <img src={thumbnail} alt="Selected product" className="w-full h-full object-cover" />
                     </div>
                 </div>
 
@@ -66,7 +66,7 @@ setThumbnail(product?.image[0]?product.image[0]:null)
 
                     <div className="mt-6">
                         <p className="text-gray-500/70 line-through">MRP: {currency}{product.price}</p>
-                        <p className="text-2xl font-medium">MRP: ₹{product.offerPrice}</p>
+                        <p className="text-2xl font-medium">MRP: ${product.offerPrice}</p>
                         <span className="text-gray-500/70">(inclusive of all taxes)</span>
                     </div>
 

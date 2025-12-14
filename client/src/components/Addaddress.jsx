@@ -83,7 +83,7 @@ function Addaddress() {
       console.log('Making API call to /api/address/add');
       console.log('Current user:', user);
       
-      // Check if we have a token
+    
       const token = localStorage.getItem('token');
       console.log('Token available:', !!token);
       
@@ -117,7 +117,7 @@ function Addaddress() {
         errorMessage = error.message;
       } else if (error.response?.status === 401) {
         errorMessage = 'Session expired. Please login again.';
-        // Clear invalid token and redirect to login
+       
         localStorage.removeItem('token');
         navigate('/login');
       }

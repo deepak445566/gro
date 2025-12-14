@@ -22,12 +22,12 @@ await connectCloudinary();
 // Simple CORS configuration
 app.use(cors({
   origin: [
-    'http://localhost:5173',
-    'https://your-frontend-domain.vercel.app' // 👈 ADD THIS
+  
+    'http://localhost:3000',
+    'http://localhost:5173'
   ],
   credentials: true
 }));
-
 
 // Middleware
 app.use(express.json());

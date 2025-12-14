@@ -101,57 +101,47 @@ export const assets = {
 };
 
 export const categories = [
- 
- 
-
-  // 🌱 New Categories
   {
-    text: "Air Purifier",
-    path: "AirPurifier",
-   
-    bgColor: "#E8F5E9",
+    text: "Organic veggies",
+    path: "Vegetables",
+    image: organic_vegitable_image,
+    bgColor: "#FEF6DA",
   },
   {
-    text: "Spray",
-    path: "Spray",
- 
-    bgColor: "#FFF3E0",
+    text: "Fresh Fruits",
+    path: "Fruits",
+    image: fresh_fruits_image,
+    bgColor: "#FEE0E0",
   },
   {
-    text: "Indoor Plants",
-    path: "IndoorPlants",
-  
-    bgColor: "#E3F2FD",
+    text: "Cold Drinks",
+    path: "Drinks",
+    image: bottles_image,
+    bgColor: "#F0F5DE",
   },
   {
-    text: "Kisaan Charger",
-    path: "KisaanCharger",
-   
-    bgColor: "#F1F8E9",
+    text: "Instant Food",
+    path: "Instant",
+    image: maggi_image,
+    bgColor: "#E1F5EC",
   },
   {
-    text: "Ceramic Pots",
-    path: "CeramicPots",
- 
-    bgColor: "#FCE4EC",
+    text: "Dairy Products",
+    path: "Dairy",
+    image: dairy_product_image,
+    bgColor: "#FEE6CD",
   },
   {
-    text: "Low Maintenance Plants",
-    path: "LowMaintenance",
-  
-    bgColor: "#E0F2F1",
+    text: "Bakery & Breads",
+    path: "Bakery",
+    image: bakery_image,
+    bgColor: "#E0F6FE",
   },
   {
-    text: "Urea",
-    path: "Urea",
-
-    bgColor: "#FFFDE7",
-  },
-  {
-    text: "Fertilizer & DAP",
-    path: "Fertilizer",
-
-    bgColor: "#F3E5F5",
+    text: "Grains & Cereals",
+    path: "Grains",
+    image: grain_image,
+    bgColor: "#F1E3F9",
   },
 ];
 

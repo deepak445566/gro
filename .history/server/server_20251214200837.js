@@ -20,13 +20,6 @@ await connectDB();
 await connectCloudinary();
 
 // Simple CORS configuration
-app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'https://your-frontend-domain.vercel.app' // 👈 ADD THIS
-  ],
-  credentials: true
-}));
 
 
 // Middleware
