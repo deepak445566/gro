@@ -38,7 +38,7 @@ export const registerUser = async (req, res) => {
 
     return res.json({
       success: true,
-      user: { id: user.id, email: user.email, name: user.name },
+      user: { id: user._id, email: user.email, name: user.name },
     });
 
   } catch (error) {

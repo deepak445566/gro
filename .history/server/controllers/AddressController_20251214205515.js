@@ -7,7 +7,7 @@ export const addAddress = async (req, res) => {
     const { address } = req.body;
     
     // Get userId from req.user (set by authUser middleware)
-    const userId = req.user.id;
+    const userId = req.user._id;
     
     // Create the address with userId
     await Address.create({ ...address, userId });
@@ -28,7 +28,7 @@ export const addAddress = async (req, res) => {
 //get address//
 export const getAddress = async (req, res) => {
   try {
-   const userId = req.user.id;  
+   const userId = req.user._id;  
     const addresses = await Address.find({ userId });
     console.log(addresses)
     res.json({
