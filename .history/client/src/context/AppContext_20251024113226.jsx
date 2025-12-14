@@ -42,18 +42,18 @@ export const AppContextProvider = ({ children }) => {
 
 
 
- const fetchUser = async () => {
-  try {
-    const { data } = await axios.get("/api/user/isauth");
-    if (data.success) {
-      setUser(data.user);
-      setCartItems(data.user.cartItems || {});
+  const fetchUser = async ()=>{
+    try {
+      const {data} = await axios.get('/api/user/isauth');
+      if(data.success){
+        setUser(data.user)
+        setCartItems(data.user.cartItems)
+
+      }
+    } catch (error) {
+      setUser(null)
     }
-  } catch (error) {
-    console.log("❌ fetchUser error:", error.response?.data);
-    setUser(null);
   }
-};
 
 
   // Fetch products
