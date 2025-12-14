@@ -20,29 +20,7 @@ await connectDB();
 await connectCloudinary();
 
 // Simple CORS configuration
-const allowedOrigins = [
-  'http://localhost:5173',
-  'https://gro-livid.vercel.app',
-  // Add any other domains you need
-];
 
-app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
-      console.error(msg);
-      return callback(new Error(msg), false);
-    }
-    
-    console.log(`CORS allowed for origin: ${origin}`);
-    return callback(null, origin);
-  },
-  credentials: true,
-  exposedHeaders: ['set-cookie'] // Important for cookies
-}));
 
 
 
